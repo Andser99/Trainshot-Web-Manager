@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+
+  </style>
+
+  <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.3.5/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.3.5/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.3.5/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.3.5/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.3.5/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.3.5/firebase-messaging.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.3.5/firebase-functions.js"></script>
+  <script lang="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.5/xlsx.full.min.js"></script>
+  <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <title>Trainshot Login</title>
+  <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700" rel="stylesheet">
+  <!-- <link href="style.css" /> -->
+  <!-- <script src="../pages/login.js"></script> -->
+</head>
+
+<body>
+  <div id="navbar" class="navbar">
+    <button id="homeButton" class="edit-button" onclick="homeButton()">Home</button>
+    <button id="logoutButton" class="edit-button" onclick="logout()">Logout</button>
+    <button id="resultButton" class="edit-button" onclick="getResults()">Results</button>
+  </div>
+  <div id="login_div" class="main-div">
+    <h3>Trainshot</h3>
+    <image src="https://www.trainshot.com/wp-content/uploads/2019/07/Trainshot-logo-inverted.png" width="300 height="
+      112"></image>
+    <input type="email" placeholder="Email..." id="email_field" />
+    <input type="password" placeholder="Password..." id="password_field" />
+
+    <button onclick="login()">Login to Account</button>
+  </div>
+
+  <div id="user_div" class="loggedin-div">
+    <h3>Trainshot Competition Manager</h3>
+    <p id="user_para">Currently logged in.</p>
+    <p id="user_data">Choose an option</p>
+    <button onclick="getCompetition()">Competitions</button>
+  </div>
+
+
+  <div id="loginPopup">
+    <div class="form-popup" id="popupForm">
+      <form class="form-container">
+        <h2>User Data</h2>
+        <input type="text" id="email" placeholder="Email" name="email" required>
+        <input type="text" id="first_name" placeholder="First Name" name="first_name" required>
+        <input type="text" id="last_name" placeholder="Last Name" name="last_name" required>
+        <input type="text" id="phone_number" placeholder="Phone Number" name="phone_number" required>
+        <button type="button" class="btn" onclick="writeUserData()">Add User</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+      </form>
+    </div>
+  </div>
+
+
+  <div id="competition_div" class="competition-div">
+    <table id="competition_table" class="competition-table">
+
+    </table>
+    <button class="edit-button" onclick="removeCompetitionData()"></button>
+  </div>
+
+  <div id="leaderboard_div" class="leaderboard-div">
+    <table id="leaderboard_table" class="leaderboard-table">
+
+    </table>
+  </div>
+
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyCifAhP0t57mMVQ7MGoFkUYuafGKFV9OSo",
+      authDomain: "trainshot-213ba.firebaseapp.com",
+      databaseURL: "https://trainshot-213ba.firebaseio.com",
+      projectId: "trainshot-213ba",
+      storageBucket: "trainshot-213ba.appspot.com",
+      messagingSenderId: "903882124417",
+      appId: "1:903882124417:web:50ed3363b913ed1f"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <script>
+    let rowEnd = "</tr>";
+    let rowStart = "<tr>";
+    let columnStart = "<td>";
+    let columnEnd = "</td>";
+    let editCompetitionButton = "";
+    let editShootersButton = "";
+    var database = firebase.database();
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        // User is signed in.
+        document.getElementById("user_div").style.display = "block";
+        document.getElementById("login_div").style.display = "none";
+        // var user = firebase.auth().currentUser;
+        // console.log("USER:" + user + "\n");
+        if (user != null) {
+
+          var email_id = user.email;
+          // console.log(user);
+          // console.log(user.uid);
+          document.getElementById("user_para").innerHTML = "User : " + email_id;
+
+          var ref = database.ref('/users/' + user.uid).once('value').then(function (snapshot) {
+            let userData = snapshot.val();
+            // console.log(userData);
+            if (userData.canManageCompetition == "TRUE") {
+              document.getElementById("navbar").style.display = "block";
+              console.log("login successful");
+            }
+            else firebase.auth().signOut();
+          });
+
+          var ref = database.ref('/competition/' + "1").once('value').then(function (snapshot) {
+            let competitionData = snapshot.val();
+            // console.log(competitionData);
+          });
+        }
+
+      } else {
+        // No user is signed in.
+
+        document.getElementById("user_div").style.display = "none";
+        document.getElementById("login_div").style.display = "block";
+
+      }
+    });
+    var userId;
+    function login() {
+
+      var userEmail = document.getElementById("email_field").value;
+      var userPass = document.getElementById("password_field").value;
+      // console.log(userPass);
+      // console.log(userEmail);
+
+      firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+        .then(function () {
+          firebase.auth().signInWithEmailAndPassword(userEmail, userPass).catch(function (error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+
+            window.alert("Error : " + errorMessage);
+            // ...
+          });
+        })
+        .catch(function (error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+        });
+    }
+
+
+
+    // Data pull
+    var userData;
+    function getCompetition() {
+      var user = firebase.auth().currentUser;
+      userId = user.uid;
+      firebase.database().ref('/users/' + userId).once('value').then(function (snapshot) {
+        userData = snapshot.val()
+        parseCompetitionData(userData);
+        console.log(userData);
+        document.getElementById("user_div").style.display = "none";
+        document.getElementById("login_div").style.display = "none";
+        document.getElementById("competition_div").style.display = "block";
+      });
+    }
+    // ...
+    function parseCompetitionData(userData) {
+      var compData = userData.competition.competitions;
+      var tableString = rowStart + "<th>" + "ID" + "</th>" + "<th>" + "Name" + "</th> <th>" + "Date" + "</th>" + rowEnd;
+      // console.log(compData);
+      for (key in compData) {
+        // console.log(key);
+        editCompetitionButton = "<button class=\"edit-button\" id=\"editStagesId" + compData[key].ID + "\"  onclick=\"editCompetition(this.id)\">Competition</button>";
+        editShootersButton = "<button class=\"edit-button\" id=\"editUsersId" + compData[key].ID + "\"  onclick=\"editUsers()\">Users</button>";
+        // console.log(compData[key].Date + " : " + compData[key].Name + "\n");
+        tableString += rowStart + columnStart + compData[key].ID + columnEnd +
+          columnStart + compData[key].Name + columnEnd +
+          columnStart + compData[key].Date + editCompetitionButton + editShootersButton + columnEnd + rowEnd;
+      }
+      document.getElementById("competition_table").innerHTML = tableString;
+    }
+
+    function editCompetition(editId) {
+      var tableString = rowStart + "<th>" + "ID" + "</th>" + "<th>" + "Drill" + "</th> <th>" + "IsDrill" + "</th> <th>" + "Name" + "</th>" + rowEnd;
+      var id = editId.replace(/^\D+/g, '');
+      // console.log(id);
+      var compData = userData.competition.competitions[id].stage;
+      // console.log(compData);
+      for (key in compData) {
+        tableString += rowStart + columnStart + compData[key].ID + columnEnd +
+          columnStart + compData[key].Drill + columnEnd +
+          columnStart + compData[key].IsDrill + columnEnd +
+          columnStart + compData[key].Name + columnEnd + rowEnd;
+        // console.log(compData[key].Drill + compData[key].ID + compData[key].IsDrill + compData[key].Name);
+      }
+
+      document.getElementById("competition_table").innerHTML = tableString;
+    }
+
+    async function editUsers() {
+      await firebase.database().ref('/users/' + userId).once('value').then(function (snapshot) {
+        userData = snapshot.val();
+      });
+      var tableString = rowStart + "<th>" + "ID" + "</th>" + "<th>" + "Email" + "</th> <th>" + "First Name" + "</th> <th>" + "Last Name" + "</th><th>" + "Phone" + "</th>" + rowEnd;
+      var compData = userData.competition.shooters;
+      // console.log(compData);
+      for (key in compData) {
+        tableString += rowStart + columnStart + compData[key].ID + columnEnd +
+          columnStart + compData[key].Email + columnEnd +
+          columnStart + compData[key].FirstName + columnEnd +
+          columnStart + compData[key].LastName + columnEnd +
+          columnStart + compData[key].PhoneNumber + columnEnd +
+          "<td class=\"remove-cell\">" + "<button class=\"remove-button\" onclick=\"removeUser(" + compData[key].ID + ")\" >X</button>" + columnEnd + rowEnd;
+        // console.log(compData[key].Drill + compData[key].ID + compData[key].IsDrill + compData[key].Name);
+      }
+      tableString += rowStart + columnStart + "<button class=\"edit-button\" onclick=\"openForm()\">Add Shooter</button>" + columnEnd +
+        columnStart + "<input type=\"file\" id=\"file_upload\">" + columnEnd + rowEnd;
+      document.getElementById("competition_table").innerHTML = tableString;
+      document.getElementById("file_upload").addEventListener('change', handleFile, false);
+    }
+
+    async function getResults() {
+      await firebase.database().ref('/users/' + userId).once('value').then(function (snapshot) {
+        userData = snapshot.val();
+      });
+      var shooterData = userData.competition.shooters;
+      var resultList = new Array();
+      // console.log(shooterData);
+      for (ids in shooterData) {
+        for (res in shooterData[ids].singleCompetition) {
+          var playerRes = {
+            "Name": shooterData[ids].FirstName + " " + shooterData[ids].LastName,
+            "Result": shooterData[ids].singleCompetition[res].results || -100
+          }
+          resultList.push(playerRes);
+        }
+      }
+      var score = 0;
+      var countShots = 0;
+      for (item in resultList) {
+        // console.log(item);
+        if (resultList[item].Result != -100) {
+          for (stage in resultList[item].Result) {
+            for (shot in resultList[item].Result[stage].Shots) {
+              score += parseFloat(resultList[item].Result[stage].Shots[shot].Score);
+              countShots++;
+            }
+          }
+          score = score / countShots;
+          console.log(resultList[item].Name + " has a score of: " + score + " in stage #" + stage);
+          resultList[item].Result = score;
+          resultList[item].Stage = stage;
+          score = 0;
+          countShots = 0;
+        }
+      }
+      console.log(resultList);
+      resultList.sort(function (a, b) {
+        return parseFloat(b.Result) - parseFloat(a.Result);
+      });
+      console.log(resultList);
+      resultNew = [];
+      resultList.forEach(function (a) {
+        if (!this[a.Name]) {
+          this[a.Name] = { Name: a.Name, Result: 0 };
+          resultNew.push(this[a.Name]);
+        }
+        this[a.Name].Result += a.Result;
+      }, Object.create(null));
+      console.log(resultNew);
+
+
+      var tableString = rowStart + "<th>" + "Name" + "</th><th>" + "Score" + "</th><th>" + "Stage ID" + "</th>" + rowEnd;
+      for (key in resultList) {
+        console.log(key);
+        tableString += rowStart + columnStart + resultList[key].Name + columnEnd +
+          columnStart + (parseFloat(resultList[key].Result) == -100 ? "NOT STARTED" : resultList[key].Result) + columnEnd +
+          columnStart + resultList[key].Stage + columnEnd + rowEnd;
+      }
+      document.getElementById("leaderboard_table").innerHTML = tableString;
+    }
+
+    async function handleFile(e) {
+      var files = e.target.files, f = files[0];
+      var reader = new FileReader();
+      reader.onload = async function (e) {
+        var data = new Uint8Array(e.target.result);
+        var excelFile = XLS.utils.sheet_to_row_object_array(XLSX.read(data, { type: 'array' }).Sheets['Sheet1']);
+        console.log(excelFile);
+        for (key in excelFile) {
+          var firstName;
+          var lastName;
+          var email;
+          if (Object.keys(excelFile[key]).length == 3) {
+            firstName = excelFile[key]['Meno a Priezvisko'];
+            email = excelFile[key]['Email'];
+            lastName = firstName.split(" ").slice(1, firstName.length - 1).join(" ");
+            firstName = firstName.split(" ")[0];
+            console.log(firstName + " " + lastName + " " + email);
+            await writeUserDataArgs(email, firstName, lastName, 'N/A');
+
+          }
+
+        }
+      };
+      reader.readAsArrayBuffer(f);
+    }
+
+    function editThisUser(userRowId) {
+      document.getElementById("");
+    }
+
+    function removeUser(shooterID) {
+      var user = firebase.auth().currentUser;
+      userId = user.uid;
+      var refDelete = firebase.database().ref('/users/' + userId + '/competition/shooters/' + shooterID);
+      if (confirm("Do you really want to remove this user? (" + shooterID + ")")) {
+        refDelete.remove()
+        .then(function () {
+          console.log("Remove succeeded.");
+          editUsers();
+        })
+        .catch(function (error) {
+          console.log("Remove failed: " + error.message);
+          window.alert("Remove failed");
+        });
+      }
+      
+    }
+
+    function openForm() {
+      document.getElementById("loginPopup").style.display = "block";
+    }
+
+    function closeForm() {
+      document.getElementById("loginPopup").style.display = "none";
+      document.getElementById("email").value = "";
+      document.getElementById("first_name").value = "";
+      document.getElementById("last_name").value = "";
+      document.getElementById("phone_number").value = "";
+    }
+
+    async function writeUserDataArgs(email, firstName, lastName, phoneNumber) {
+      var user = firebase.auth().currentUser;
+      userId = user.uid;
+      var nextIndex = 0;
+      var tempData;
+      await firebase.database().ref('/users/' + userId + '/competition/shooters').once('value').then(function (snapshot) {
+        tempData = snapshot.val();
+        // nextIndex = Object.keys(tempData).length + 1;
+        var keys = Object.keys(tempData);
+        nextIndex = parseInt(keys[keys.length - 1]) + 1;
+        console.log("Continuing with index: " + nextIndex);
+        var newUser = firebase.database().ref('users/' + userId + '/competition/shooters/' + nextIndex);
+        console.log(email + firstName + lastName + phoneNumber);
+        newUser.set({
+          Email: email,
+          FirstName: firstName,
+          ID: nextIndex,
+          LastName: lastName,
+          PhoneNumber: phoneNumber
+        }, function (error) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("SUCCESSFULLY ADDED");
+            firebase.database().ref('/users/' + userId).once('value').then(function (snapshot) {
+              userData = snapshot.val();
+              editUsers();
+            });
+          }
+        });
+      });
+    }
+
+    function writeUserData() {
+      var user = firebase.auth().currentUser;
+      userId = user.uid;
+      var nextIndex = 0;
+      var tempData;
+      firebase.database().ref('/users/' + userId + '/competition/shooters').once('value').then(function (snapshot) {
+        tempData = snapshot.val();
+        let _email = document.getElementById("email").value;
+        let _firstName = document.getElementById("first_name").value;
+        let _lastName = document.getElementById("last_name").value;
+        let _phoneNumber = document.getElementById("phone_number").value;
+        // nextIndex = Object.keys(tempData).length + 1;
+        var keys = Object.keys(tempData);
+        nextIndex = parseInt(keys[keys.length - 1]) + 1;
+        // console.log("Continuing with next index: " + nextIndex);
+        var newUser = firebase.database().ref('users/' + userId + '/competition/shooters/' + nextIndex);
+        newUser.set({
+          Email: _email,
+          FirstName: _firstName,
+          ID: nextIndex,
+          LastName: _lastName,
+          PhoneNumber: _phoneNumber
+        }, function (error) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("SUCCESSFULLY ADDED");
+            firebase.database().ref('/users/' + userId).once('value').then(function (snapshot) {
+              userData = snapshot.val();
+              editUsers();
+              closeForm();
+            });
+          }
+        });
+
+      }, function (error) {
+
+        if (error) {
+          // console.log(error);
+        }
+        else { }
+      });
+      // console.log(tempData);
+      for (value in tempData) {
+        nextIndex++;
+      }
+    }
+
+    function removeCompetitionData() {
+      var user = firebase.auth().currentUser;
+      userId = user.uid;
+      var refDelete = firebase.database().ref('/users/' + userId + '/competition');
+      if (confirm("Do you really want to remove all competition data?")) {
+        refDelete.remove()
+        .then(function () {
+          console.log("Competition removed successfully.");
+          homeButton();
+        })
+        .catch(function (error) {
+          console.log("Competition removal failed: " + error.message);
+          window.alert("Removal failed");
+        });
+      }
+      
+    }
+    }
+
+    function homeButton() {
+      parseCompetitionData(userData);
+    }
+
+    function logout() {
+      document.getElementById("navbar").style.display = "none";
+      document.getElementById("competition_div").style.display = "none";
+
+      firebase.auth().signOut();
+    }
+  </script>
+
+</body>
+
+</html>

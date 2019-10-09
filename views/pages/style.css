@@ -1,0 +1,367 @@
+html {
+  min-height: 100%;
+}
+
+body {
+overflow: auto;
+background:rgb(32,32,32);
+background: linear-gradient(0deg, rgba(48,48,48,1) 0%, rgba(14,14,14,1) 43%, rgba(60,60,60,1) 100%);
+padding: 0px;
+margin: 0px;
+font-family: sans-serif;
+font-size: 16px;
+}
+
+input, button {
+font-family: sans-serif;
+font-weight: 700;
+}
+
+.navbar {
+  display: none;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.main-div, .loggedin-div {
+width: 20%;
+margin: 0px auto;
+margin-top: 150px;
+padding: 20px;
+display: none;
+}
+.loggedin-div p, .loggedin-div h3{
+color:#fff;
+}
+
+.main-div input {
+display: block;
+border: 1px solid #ccc;
+border-radius: 5px;
+background: #fff;
+padding: 15px;
+outline: none;
+width: 100%;
+margin-bottom: 20px;
+transition: 0.3s;
+-webkit-transition: 0.3s;
+-moz-transition: 0.3s;
+}
+
+.main-div input:focus {
+border: 1px solid #777;
+}
+
+.edit-button {
+margin-left: 5px;
+background: #5d8ffc;
+color: #fff;
+border: 1px solid #5d8ffc;
+border-radius: 1px;
+padding: 5px;
+transition: 0.1s;
+-webkit-transition: 0.3s;
+-moz-transition: 0.3s;
+}
+
+.remove-button {
+  margin-left: 5px;
+  background: #cc0000;
+  color: #000000;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  padding: 5px;
+  transition: 0.1s;
+  -webkit-transition: 0.3s;
+  -moz-transition: 0.3s;
+  }
+
+.edit-button:hover {
+background: #fff;
+color: #5d8ffc;
+border: 1px solid #5d8ffc;
+cursor: pointer;
+}
+
+.main-div button, .loggedin-div button {
+background: #5d8ffc;
+color: #fff;
+border: 1px solid #5d8ffc;
+border-radius: 5px;
+padding: 15px;
+display: block;
+width: 100%;
+transition: 0.3s;
+-webkit-transition: 0.3s;
+-moz-transition: 0.3s;
+}
+
+.main-div button:hover, .loggedin-div button:hover {
+background: #fff;
+color: #5d8ffc;
+border: 1px solid #5d8ffc;
+cursor: pointer;
+}
+
+.competition-div{
+width: 50%;
+margin: 0px auto;
+margin-top: 150px;
+padding: 20px;
+display: none;
+}
+
+.competition-table {
+background: inherit;
+border-radius:3px;
+border-collapse: collapse;
+height: 200px;
+margin: auto;
+max-width: 1080px;
+padding:5px;
+width: 100%;
+animation: float 5s infinite;
+}
+
+.leaderboard-div{
+  width: 30%;
+  margin: 0px auto;
+  margin-top: 150px;
+  padding: 20px;
+  display: none;
+}
+  
+.leaderboard-table {
+  background: inherit;
+  border-radius:3px;
+  border-collapse: collapse;
+  height: 200px;
+  margin: auto;
+  max-width: 1080px;
+  padding:5px;
+  width: 100%;
+  animation: float 5s infinite;
+}
+
+.game-setup-div{
+  width: 30%;
+  min-width: 300px;
+  margin: 0px auto;
+  margin-top: 150px;
+  padding: 20px;
+  display: none;
+}
+  
+.game-setup-table {
+  background: inherit;
+  border-radius:3px;
+  border-collapse: collapse;
+  height: 200px;
+  margin: auto;
+  max-width: 1080px;
+  padding:5px;
+  width: 100%;
+  animation: float 5s infinite;
+}
+
+.player-input {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding-top: 20px;
+  border: none;
+  border-radius: 0;
+  color: white;
+  background: #333;
+  font-size: 15px;
+  transition: .3s ease;
+}
+
+.player-color-cell {
+  border: none;
+  background: inherit;
+}
+
+.player-cell {
+  border: none;
+  background: inherit;
+}
+
+.nohover{
+  border: none;
+  background: inherit;
+}
+
+.multiplayer-setup-div{
+  width: 40%;
+  margin: 0px auto;
+  margin-top: 150px;
+  padding: 20px;
+  display: none;
+}
+  
+.multiplayer-setup-table {
+  background: inherit;
+  border-radius:3px;
+  border-collapse: collapse;
+  height: 200px;
+  margin: auto;
+  max-width: 1080px;
+  padding:5px;
+  width: 100%;
+  animation: float 5s infinite;
+}
+
+tr:hover:not(.nohover) td  {
+background:dimgray;
+color:#FFFFFF;
+border-top: 1px solid #22262e;
+}
+
+td {
+background:#FFFFFF;
+border-left: 1px solid #9ea7af;
+padding:20px;
+text-align:center;
+vertical-align:middle;
+font-weight:300;
+font-size:18px;
+text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+border-right: 1px solid #C1C3D1;
+}
+
+td:first-child {
+text-align:center;
+}
+
+.remove-cell {
+  background:inherit;
+  border-left: 1px solid #9ea7af;
+  border-right: 1px solid #9ea7af;
+  border-top: none;
+  border-bottom: none;
+  padding:5px;
+  text-align:center;
+  vertical-align:middle;
+  font-weight:300;
+  font-size:18px;
+  text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+  }
+
+th {
+color:#D5DDE5;;
+background:#1b1e24;
+padding-left: 5px;
+border-bottom:4px solid #9ea7af;
+border-right: 1px solid #343a45;
+font-size:23px;
+font-weight: 100;
+padding:12px;
+text-align:center;
+text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+vertical-align:middle;
+}
+
+th:first-child {
+text-align:center;
+}
+
+tr {
+border-top: 1px solid #C1C3D1;
+border-bottom: 1px solid #C1C3D1;
+color:#666B85;
+font-size:16px;
+font-weight:normal;
+text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);
+}
+#registerPopup {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+#loginPopup, #registerPopup {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+    .register-form-nick-div {
+      display: none;
+    }
+    /* Fix the button on the left side of the page */
+    .open-btn {
+    display: flex;
+    justify-content: left;
+    }
+    /* Style and fix the button on the page */
+    .open-button {
+    background-color: #1c87c9;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    opacity: 0.8;
+    position: fixed;
+    }
+    /* Hide the Popup form */
+    .form-popup {
+    border: 2px solid #666;
+    z-index: 9;
+    max-width: 300px;
+    margin: 0 auto;
+    }
+    /* Styles for the form container */
+    .form-container {
+    max-width: 300px;
+    padding: 20px;
+    background-color: #fff;
+    }
+    /* Full-width for input fields */
+    .form-container input[type=text], .form-container input[type=password] {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 22px 0;
+    border: none;
+    background: #eee;
+    }
+    /* When the inputs get focus, do something */
+    .form-container input[type=text]:focus, .form-container input[type=password]:focus {
+    background-color: #ddd;
+    outline: none;
+    }
+    /* Style submit/login button */
+    .form-container .btn {
+    background-color: #8ebf42;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom:10px;
+    opacity: 0.8;
+    }
+    /* Style cancel button */
+    .form-container .cancel {
+    background-color: #cc0000;
+    }
+    /* Hover effects for buttons */
+    .form-container .btn:hover, .open-button:hover {
+    opacity: 1;
+    }
