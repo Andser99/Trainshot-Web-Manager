@@ -1918,9 +1918,9 @@
           if (Object.keys(multiplayerData[startIndex])[0] > midnightLimit) { console.log("JEBALTOPES"); break; }
           startIndex++;
         }
-        startIndex--;
-        Report.gameCount = multiplayerData.length - startIndex;
-        while (startIndex < multiplayerData.length) {
+
+        while (startIndex <= multiplayerData.length) {
+          Report.gameCount++;
           for (game in multiplayerData[startIndex]) {
             Report.roundCount++;
             for (player in multiplayerData[startIndex][game]) {
