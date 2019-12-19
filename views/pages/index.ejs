@@ -676,13 +676,14 @@
   <div id="user_div" class="loggedin-div">
     <h3 style="text-align: center;">Trainshot Manager</h3>
     <p id="user_para">Currently logged in.</p>
-    <hr>
+    <!-- <hr>
     <button onclick="createNewCompetition()" style="margin-bottom: 5px;">New Competition</button>
-    <button onclick="getCompetition()" style="margin-bottom: 5px;">Competitions</button>
+    <button onclick="getCompetition()" style="margin-bottom: 5px;">Competitions</button> -->
+
     <hr>
     <button onclick="createNewMultiplayerGame()" style="margin-bottom: 5px;">New Mutliplayer Game</button>
     <button onclick="loadingCursorOn();StartMultiplayerRefresh()" style="margin-bottom: 5px;">Multiplayer
-      Leaderboard</button>
+      Results</button>
     <hr>
   </div>
 
@@ -846,7 +847,7 @@
   </div>
 
   <div id="multiplayer_table_div" class="multiplayer-table-div">
-    <img id="partner_icon_white" class="img-center" src="PartnerLogoWhite.png" style="display: block;" width="auto"
+    <img id="partner_icon_white" class="img-center" src="" style="display: block;" width="auto"
       height="100" alt="Trainshot Logo">
     <img class="print-disabled invert-color" src="TrainshotLogoWhite.png" width="150" height="auto"
       style="display: flex; float: right; padding-bottom: 10px; margin-top: 7px;">
@@ -1093,6 +1094,26 @@
         document.getElementById("verify_6").click();
       }
     });
+
+
+    console.log(`%c                     .--,
+     .-.    __,,,__/    |
+    /   \-'\`        \`-./_
+    |    |               \`)
+     \\   \`             \`\\ ;
+    /       ,        ,    |
+    |      /         : O /_
+    |          O  .--;__   '.
+    |                (  )\`.  |
+    \\                 \`-\` /  |
+     \\          ,_  _.-./\`  /
+      \\          \\\`\`-.(    /
+      |           \`---'   /--.
+    ,--\\___..__        _.'   /--.
+    \\          \`-._  _\`/    '    '.
+    .' \` ' .       \`\`    '        .`, "font-family:monospace");
+
+
     let rowEnd = "</tr>";
     let rowStart = "<tr>";
     let columnStart = "<td>";
@@ -1121,6 +1142,8 @@
             let userData = snapshot.val();
             // console.log(userData);
             if (userData.canManageCompetition == "TRUE") {
+              var logoString = userData.multiplayer.Logo;
+              document.getElementById("partner_icon_white").src = logoString;
               document.getElementById("user_div").style.display = "block";
               document.getElementById("login_div").style.display = "none";
               document.getElementById("navbar").style.display = "block";
@@ -1208,7 +1231,7 @@
       userId = user.uid;
       loadingCursorOn();
       await firebase.database().ref('/users/' + userId).once('value').then(function (snapshot) {
-        userData = snapshot.val()
+        userData = snapshot.val();
         console.log(userData);
         parseCompetitionData(userData);
         document.getElementById("back_button").style.display = "none";
@@ -1303,10 +1326,10 @@
               "totalTime": "0",
               "averageTime": "0",
             });
-            totalScores[multiplayerResults[game][playerResult].Name] = parseFloat(multiplayerResults[game][playerResult].totalTime);
+            totalScores[multiplayerResults[game][playerResult].Name] = parseFloat(multiplayerResults[game][playerResult].averageTime);
           }
           else {
-            totalScores[multiplayerResults[game][playerResult].Name] += parseFloat(multiplayerResults[game][playerResult].totalTime);
+            totalScores[multiplayerResults[game][playerResult].Name] += parseFloat(multiplayerResults[game][playerResult].averageTime);
           }
           formattedResults[i] = {
             "Name": multiplayerResults[game][playerResult].Name,
@@ -1349,7 +1372,7 @@
         tableString += rowStart + "<td style=\"font-weight: bold;\">" + gameCount + columnEnd;
         players.forEach((item, index) => {
           var tempTime;
-          try { tempTime = parseFloat(Object.values(multiplayerResults[game]).find(x => x.Name == item).totalTime).toFixed(2) + "s"; }
+          try { tempTime = parseFloat(Object.values(multiplayerResults[game]).find(x => x.Name == item).averageTime).toFixed(2) + "s"; }
           catch {
             tempTime = "-";
           }
@@ -1867,6 +1890,41 @@
             customAlert("Remove failed", "red");
           });
       }
+
+    }
+
+    async function getDailyData() {
+      var userId = firebase.auth().currentUser.uid;
+      var multiplayerData;
+      var Report = {
+        "gameCount" : 0,
+        "distinctPlayers" : 0
+      }
+      var d = new Date(); 
+      var midnightLimit = "";
+      d.setHours(0,0,0,0);
+
+      midnightLimit += d.getFullYear().toString() + (d.getMonth()+1).toString().padStart(2, '0') + d.getDate().toString().padStart(2, '0') + "000000";
+      var midnightLimit = parseInt(midnightLimit);
+
+      await firebase.database().ref('/users/' + userId + '/multiplayer/results').once('value').then(function (snapshot) {
+        multiplayerData = snapshot.val();
+        console.log(multiplayerData);
+        var startIndex = 0;
+
+        while (startIndex < multiplayerData.length) {
+          if (Object.keys(multiplayerData[startIndex])[0] > midnightLimit) {console.log("JEBALTOPES"); break;}
+          startIndex++;
+        }
+
+        while (startIndex <= multiplayerData.length) {
+          for (game in multiplayerData[startIndex]) {
+            Report.gameCount++;
+          }
+          startIndex++;
+        }
+        console.log(Report.gameCount);
+      });
 
     }
 
