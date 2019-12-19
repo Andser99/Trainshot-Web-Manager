@@ -1898,8 +1898,10 @@
       var multiplayerData;
       var Report = {
         "gameCount" : 0,
+        "roundCount" : 0,
         "distinctPlayers" : 0
       }
+      var PlayerCollection = {};
       var d = new Date(); 
       var midnightLimit = "";
       d.setHours(0,0,0,0);
@@ -1913,17 +1915,25 @@
         var startIndex = 0;
 
         while (startIndex < multiplayerData.length) {
-          if (Object.keys(multiplayerData[startIndex])[0] > midnightLimit) {console.log("JEBALTOPES"); break;}
+          if (Object.keys(multiplayerData[startIndex])[0] > midnightLimit) { console.log("JEBALTOPES"); break; }
           startIndex++;
         }
 
         while (startIndex <= multiplayerData.length) {
+          Report.gameCount++;
           for (game in multiplayerData[startIndex]) {
-            Report.gameCount++;
+            Report.roundCount++;
+            for (player in multiplayerData[startIndex][game]) {
+              console.log(multiplayerData[startIndex][game][player].Name)
+              PlayerCollection[multiplayerData[startIndex][game][player].Name] = 1;
+            }
           }
           startIndex++;
         }
-        console.log(Report.gameCount);
+        console.log("\nReport for " + d.getDate() + ". " + d.getMonth() + ". " + d.getFullYear().toString() + ":");
+        console.log("Distinct players: " + Object.keys(PlayerCollection).length);
+        console.log("Games played: " + Report.gameCount);
+        console.log("Rounds played: " + Report.roundCount);
       });
 
     }
